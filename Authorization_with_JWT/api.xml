@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Authorization_with_JWT</name>
+    </assembly>
+    <members>
+        <member name="M:Authorization_with_JWT.Controllers.AccountController.#ctor(Microsoft.AspNetCore.Identity.UserManager{CitiesManager.Core.Identity.ApplicationUser},Microsoft.AspNetCore.Identity.SignInManager{CitiesManager.Core.Identity.ApplicationUser},Microsoft.AspNetCore.Identity.RoleManager{CitiesManager.Core.Identity.ApplicationRole},CitiesManager.Core.ServiceContracts.IJwtService)">
+            <summary>
+            
+            </summary>
+            <param name="userManager"></param>
+            <param name="signInManager"></param>
+            <param name="roleManager"></param>
+        </member>
+        <member name="M:Authorization_with_JWT.Controllers.AccountController.PostRegister(CitiesManager.Core.DTO.RegisterDTO)">
+            <summary>
+            FOR Register the new use Using JWT Authentication
+            </summary>
+            <param name="registerDTO"></param>
+            <returns> Return Application Response</returns>
+        </member>
+        <member name="M:Authorization_with_JWT.Controllers.AccountController.IsEmailAlreadyRegistered(System.String)">
+            <summary>
+               if Entered Email is already exits then
+            </summary>
+            <param name="email"></param>
+            <returns> it return true and false</returns>
+        </member>
+        <member name="M:Authorization_with_JWT.Controllers.AccountController.PostLogin(CitiesManager.Core.DTO.LoginDTO)">
+            <summary>
+            For login 
+            </summary>
+            <param name="loginDTO"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Authorization_with_JWT.Controllers.AccountController.GetLogout">
+            <summary>
+             for log out
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
