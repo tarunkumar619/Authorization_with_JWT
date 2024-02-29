@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Authorization_with_JWT.Controllers
 {
@@ -158,6 +159,11 @@ namespace Authorization_with_JWT.Controllers
 
             return NoContent();
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tokenModel"></param>
+        /// <returns></returns>
 
         [HttpPost("generate-new-jwt-token")]
         public async Task<IActionResult> GenerateNewAccessToken(TokenModel tokenModel)
@@ -168,14 +174,35 @@ namespace Authorization_with_JWT.Controllers
             }
 
             string? jwtToken = tokenModel.Token;
-            string? refreshToken = tokenModel.RefershToken;
+         
          
 
+           ClaimsPrincipal? principal=_jwtService.GetPrincipalFromJwtToken(jwtToken);
+            if (principal == null)
+            {
+                return BadRequest("invaild jwt access token");
+            }
 
-            
+
+                string? email= principal.FindFirstValue(ClaimTypes.NameIdentifier);
+                ApplicationUser? user= await _userManager.FindByNameAsync(email);
+
+
+            if (user == null || user.Refresh  != tokenModel.RefershToken|| user.RefreshTokenExpriationDatetime<=DateTime.Now)
+            {
+                return BadRequest(" Invaild Refresh token");
+            }
+
+        AuthenticationResponse authenticationResponse =  _jwtService.CreateJwtToken(user);
+
+            user.Refresh = authenticationResponse.RefreshToken;
+            user.RefreshTokenExpriationDatetime = authenticationResponse.RefreshTokenExpirationDatetime;
+
+            await _userManager.UpdateAsync(user);
+
+
+
+            return Ok(authenticationResponse);
         }
-
-
-
     }
 }

@@ -34,17 +34,18 @@ namespace CitiesManager.Core.Services
             randomNumberGenterator.GetBytes(bytes);
             return Convert.ToBase64String(bytes);
         }
-        public AuthenticationResponse CreateJwtToken(ApplicationUser user) { 
-       DateTime expiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:EXPIRATION_MINUTES"]));
+            public AuthenticationResponse CreateJwtToken(ApplicationUser user) { 
+            DateTime expiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:EXPIRATION_MINUTES"]));
            
-            Claim[] claims = new Claim[]
-            { 
-    new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()), 
-    new Claim(ClaimTypes.NameIdentifier, user.Email),
-    new Claim(ClaimTypes.Name, user.PersonName)
-            };
+                            Claim[] claims = new Claim[]
+                            { 
+                            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                            new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()), 
+                            new Claim(ClaimTypes.NameIdentifier, user.Email),
+                            new Claim(ClaimTypes.Name, user.PersonName),
+                            new Claim(ClaimTypes.Email, user.Email)
+                            };
 
             SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             SigningCredentials signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -60,15 +61,13 @@ namespace CitiesManager.Core.Services
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
             string token = tokenHandler.WriteToken(tokengen);
             return new AuthenticationResponse { 
-                Token = token,
-                
+                Token = token,              
                 Email = user.Email, 
                 PersonName = user.PersonName, 
                 Expiration = expiration, 
                 RefreshToken = GenerateRefershToken() ,
                 RefreshTokenExpirationDatetime = DateTime.Now.
-                AddMinutes(Convert.ToInt32(_configuration["RefreshToken:EXPIRATION_MINUTES"]))
-            
+                AddMinutes(Convert.ToInt32(_configuration["RefreshToken:EXPIRATION_MINUTES"]))           
             };
         
         }
@@ -81,10 +80,8 @@ namespace CitiesManager.Core.Services
                 ValidAudience = _configuration["Jwt:Audience"],
                 ValidateIssuer = true,
                 ValidIssuer = _configuration["Jwt:Issuer"],
-
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])),
-
                 ValidateLifetime = false //should be false
             };
 
@@ -94,9 +91,12 @@ namespace CitiesManager.Core.Services
                  ClaimsPrincipal  Principal=
                         jwtSecurityTokenHandler.ValidateToken(token, tokenValidationParameters,out SecurityToken securityToken);
             
+            if(securityToken is not JwtSecurityToken jwtSecurityToken|| ! jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,StringComparison.InvariantCultureIgnoreCase)    )
+            {
+                throw new SecurityTokenException("Invaild Token");
+            }
 
-
-
+            return Principal;   
         }
 
 

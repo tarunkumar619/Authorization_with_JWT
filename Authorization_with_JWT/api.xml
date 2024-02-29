@@ -39,5 +39,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Authorization_with_JWT.Controllers.AccountController.GenerateNewAccessToken(CitiesManager.Core.DTO.TokenModel)">
+            <summary>
+            
+            </summary>
+            <param name="tokenModel"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>
